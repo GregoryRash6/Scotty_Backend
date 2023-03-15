@@ -16,8 +16,14 @@ load_dotenv()
 # Save Password
 password = os.getenv("password")
 
+url = os.getenv("url")
+
+port = os.getenv("port")
+
+database = os.getenv("database")
+
 # Set Connection String
-connection_string = f"postgres:{password}@localhost:5432/inventory_db"
+connection_string = f"postgres:{password}@{url}:{port}/{database}"
 
 # Set Engine
 engine = create_engine(f'postgresql://{connection_string}')
