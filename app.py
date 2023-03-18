@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, inspect, func
-from flask import Flask, jsonify, render_template, redirect
+from flask import Flask, jsonify, render_template, redirect, request
 from dotenv import load_dotenv
 
 # Create Instance of Flask App
@@ -50,7 +50,7 @@ def index():
 
 
 # Create Dates Route
-@app.route("/products")
+@app.route("/inventory")
 # Define Dates Function
 def dates():
     """Returns products available for purchase"""
@@ -59,7 +59,8 @@ def dates():
         Inventory.name,
         Inventory.price,
         Inventory.size,
-        Inventory.quantity
+        Inventory.quantity,
+        Inventory.image_url
     ]
 
     # Perform SQL Query
@@ -75,13 +76,30 @@ def dates():
             "price": float(result[x][1]),
             "size": result[x][2],
             "quantity": result[x][3],
+            "image_url": result[x][4],
         })
     
     return jsonify(inventory)
+
+@app.route('/inventory/<id>', methods=['PUT'])
+def update_inventory(id):
+    session = Session(engine)
     
-
-
-
+    # get request data
+    new_quantity = request.json['quantity']
+    
+    # get inventory item by id
+    inventory_item = session.query(Inventory).filter_by(id=id).first()
+    
+    # update inventory item properties
+    inventory_item.quantity = new_quantity
+    
+    # commit changes and close session
+    session.commit()
+    session.close()
+    
+    return 'Inventory Updated'
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
