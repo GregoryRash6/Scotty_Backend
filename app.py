@@ -55,7 +55,7 @@ def inventory():
 
     return jsonify(inventory_list)
 
-@app.route('/inventory/<id>', methods=['PUT'])
+@app.route('/update_inventory/<id>', methods=['PATCH'])
 def update_inventory(id):
     with Session(engine) as session:
         inventory_item = session.query(Inventory).filter_by(id=id).first()
@@ -82,6 +82,37 @@ def update_inventory(id):
         session.commit()
 
     return jsonify(report)
+
+@app.route('/add_inventory', methods=['POST'])
+def add_inventory():
+    with Session(engine) as session:
+        new_item = Inventory(
+            name=request.json['name'],
+            price=request.json['price'],
+            size=request.json['size'],
+            quantity=request.json['quantity'],
+            image_url=request.json['image_url'],
+            sku=request.json['sku']
+        )
+        session.add(new_item)
+        session.commit()
+
+    return jsonify({'message': 'New item added to inventory!'})
+
+@app.route('/delete_inventory/<id>', methods=['DELETE'])
+def delete_inventory(id):
+    with Session(engine) as session:
+        inventory_item = session.query(Inventory).filter_by(id=id).first()
+
+        if inventory_item is None:
+            return jsonify({'error': 'Item not found!'}), 404
+
+        session.delete(inventory_item)
+
+        session.commit()
+
+    return jsonify({'message': 'Item deleted from inventory!'})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
