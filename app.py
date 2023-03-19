@@ -22,6 +22,7 @@ Base = automap_base()
 Base.prepare(autoload_with=engine)
 Inventory = Base.classes.inventory
 
+
 @app.before_request
 def require_api_key():
     if request.endpoint in ['update_inventory', 'add_inventory', 'delete_inventory/<id>']:
@@ -29,10 +30,12 @@ def require_api_key():
         if key != api_key:
             abort(401, 'Unauthorized')
 
+
 @app.route("/")
 def index():
     """Returns Homepage"""
     return render_template("index.html")
+
 
 @app.route("/inventory")
 def inventory():
@@ -44,7 +47,8 @@ def inventory():
             Inventory.size,
             Inventory.quantity,
             Inventory.image_url,
-            Inventory.sku
+            Inventory.sku,
+            Inventory.id
         ]
 
         result = session.query(*sel).distinct().all()
@@ -57,11 +61,13 @@ def inventory():
                 "quantity": row[3],
                 "image_url": row[4],
                 "sku": row[5],
+                "id": row[6],
             }
             for row in result
         ]
 
     return jsonify(inventory_list)
+
 
 @app.route('/update_inventory/<id>', methods=['PATCH'])
 def update_inventory(id):
@@ -77,19 +83,31 @@ def update_inventory(id):
             'sku': request.json.get('sku')
         }
 
-        report = []
+        report = {}
 
         for key, value in updates.items():
             if value is not None and getattr(inventory_item, key) != value:
-                if key == "price":
-                    report.append(f"{key.capitalize()} changed from ${getattr(inventory_item, key)} to ${value:.2f}")
-                else:
-                    report.append(f"{key.capitalize()} changed from {getattr(inventory_item, key)} to {value}")
+                report[key] = {
+                    'old_value': getattr(inventory_item, key),
+                    'new_value': value
+                }
                 setattr(inventory_item, key, value)
 
         session.commit()
 
-    return jsonify(report)
+        updated_item = {
+            'id': inventory_item.id,
+            'name': inventory_item.name,
+            'price': float(inventory_item.price),
+            'size': inventory_item.size,
+            'quantity': inventory_item.quantity,
+            'image_url': inventory_item.image_url,
+            'sku': inventory_item.sku
+        }
+        updated_item.update(report)
+
+    return jsonify(updated_item)
+
 
 @app.route('/add_inventory', methods=['POST'])
 def add_inventory():
@@ -105,7 +123,18 @@ def add_inventory():
         session.add(new_item)
         session.commit()
 
-    return jsonify({'message': 'New item added to inventory!'})
+        added_item = {
+            'id': new_item.id,
+            'name': new_item.name,
+            'price': float(new_item.price),
+            'size': new_item.size,
+            'quantity': new_item.quantity,
+            'image_url': new_item.image_url,
+            'sku': new_item.sku
+        }
+
+    return jsonify(added_item)
+
 
 @app.route('/delete_inventory/<id>', methods=['DELETE'])
 def delete_inventory(id):
@@ -115,11 +144,20 @@ def delete_inventory(id):
         if inventory_item is None:
             return jsonify({'error': 'Item not found!'}), 404
 
-        session.delete(inventory_item)
+        deleted_product = {
+            'id': inventory_item.id,
+            'name': inventory_item.name,
+            'price': float(inventory_item.price),
+            'size': inventory_item.size,
+            'quantity': inventory_item.quantity,
+            'image_url': inventory_item.image_url,
+            'sku': inventory_item.sku
+        }
 
+        session.delete(inventory_item)
         session.commit()
 
-    return jsonify({'message': 'Item deleted from inventory!'})
+    return jsonify(deleted_product)
 
 
 if __name__ == "__main__":
