@@ -2,7 +2,7 @@ import os
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, inspect, func
-from flask import Flask, jsonify, render_template, redirect, request
+from flask import Flask, jsonify, render_template, redirect, request, abort
 from dotenv import load_dotenv
 
 app = Flask(__name__)
@@ -13,6 +13,7 @@ password = os.getenv("password")
 url = os.getenv("url")
 port = os.getenv("port")
 database = os.getenv("database")
+api_key = os.getenv("api_key")
 
 connection_string = f"postgres:{password}@{url}:{port}/{database}"
 engine = create_engine(f'postgresql://{connection_string}')
@@ -20,6 +21,13 @@ engine = create_engine(f'postgresql://{connection_string}')
 Base = automap_base()
 Base.prepare(autoload_with=engine)
 Inventory = Base.classes.inventory
+
+@app.before_request
+def require_api_key():
+    if request.endpoint in ['update_inventory', 'add_inventory', 'delete_inventory/<id>']:
+        key = request.headers.get('api_key')
+        if key != api_key:
+            abort(401, 'Unauthorized')
 
 @app.route("/")
 def index():

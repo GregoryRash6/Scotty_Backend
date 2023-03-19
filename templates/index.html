@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Documentation</title>
+</head>
+<body>
+	<h1>Documentation</h1>
+	<h2>Endpoints</h2>
+<table>
+	<thead>
+		<tr>
+			<th>HTTP Method</th>
+			<th>Endpoint</th>
+			<th>Description</th>
+			<th>Requires API Key</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>GET</td>
+			<td>/</td>
+			<td>Returns the homepage.</td>
+			<td>No</td>
+		</tr>
+		<tr>
+			<td>GET</td>
+			<td>/documentation</td>
+			<td>Returns the documentation.</td>
+			<td>No</td>
+		</tr>
+		<tr>
+			<td>GET</td>
+			<td>/inventory</td>
+			<td>Returns a JSON object containing all products available for purchase.</td>
+			<td>No</td>
+		</tr>
+		<tr>
+			<td>PATCH</td>
+			<td>/update_inventory/&lt;id&gt;</td>
+			<td>Updates the product with the specified ID.</td>
+			<td>Yes</td>
+		</tr>
+		<tr>
+			<td>POST</td>
+			<td>/add_inventory</td>
+			<td>Adds a new product to the inventory.</td>
+			<td>Yes</td>
+		</tr>
+		<tr>
+			<td>DELETE</td>
+			<td>/delete_inventory/&lt;id&gt;</td>
+			<td>Deletes the product with the specified ID.</td>
+			<td>Yes</td>
+		</tr>
+	</tbody>
+</table>
+	<h2>API Key</h2>
+	<p>The API key is required for endpoints that modify the inventory. To use these endpoints, include the API key in the request headers with the key <code>api_key</code>.</p>
+	<h2>Schema</h2>
+	<p>The database schema for the inventory table is as follows:</p>
+	<table>
+		<thead>
+			<tr>
+				<th>Column</th>
+				<th>Type</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>id</td>
+				<td>integer</td>
+				<td>Unique ID for the product.</td>
+			</tr>
+			<tr>
+				<td>name</td>
+				<td>string</td>
+				<td>Name of the product.</td>
+			</tr>
+			<tr>
+				<td>price</td>
+				<td>float</td>
+				<td>Price of the product in USD.</td>
+			</tr>
+			<tr>
+				<td>size</td>
+				<td>string</td>
+				<td>Size of the product.</td>
+			</tr>
+			<tr>
+				<td>quantity</td>
+				<td>integer</td>
+				<td>Quantity of the product available for purchase.</td>
+			</tr>
+			<tr>
+				<td>image_url</td>
+				<td>string</td>
+				<td>URL of the product image.</td>
+			</tr>
+			<tr>
+				<td>sku</td>
+				<td>string</td>
+				<td>Stock Keeping Unit (SKU) for the product.</td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+</html>
