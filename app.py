@@ -1,19 +1,14 @@
-# Import Dependencies
 import os
-import pandas as pd
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, inspect, func
 from flask import Flask, jsonify, render_template, redirect, request
 from dotenv import load_dotenv
 
-# Create Instance of Flask App
 app = Flask(__name__)
 
-# Load Dot Env
 load_dotenv()
 
-# Save Password
 password = os.getenv("password")
 
 url = os.getenv("url")
@@ -22,37 +17,27 @@ port = os.getenv("port")
 
 database = os.getenv("database")
 
-# Set Connection String
 connection_string = f"postgres:{password}@{url}:{port}/{database}"
 
-# Set Engine
 engine = create_engine(f'postgresql://{connection_string}')
 
-# create the base and prepare the tables
 Base = automap_base()
+
 Base.prepare(autoload_with=engine)
 
-# Save References to Table
 Inventory = Base.classes.inventory
 
-# # Create Session
 session = Session(engine)
 
-
-# Create Home Route
 @app.route("/")
-# Define Index Function
 def index():
     """Returns Homepage"""
 
     # Render Template
     return render_template("index.html")
 
-
-# Create Dates Route
 @app.route("/inventory")
-# Define Dates Function
-def dates():
+def inventory():
     """Returns products available for purchase"""
 
     sel = [
@@ -60,45 +45,59 @@ def dates():
         Inventory.price,
         Inventory.size,
         Inventory.quantity,
-        Inventory.image_url
+        Inventory.image_url,
+        Inventory.sku
     ]
 
-    # Perform SQL Query
     result = session.query(*sel)\
     .distinct()\
     .all()
     
-    inventory = []
+    inventory_list = []
 
     for x in range(len(result)):
-        inventory.append({
+        inventory_list.append({
             "name": result[x][0],
             "price": float(result[x][1]),
             "size": result[x][2],
             "quantity": result[x][3],
             "image_url": result[x][4],
+            "sku": result[x][5],
         })
     
-    return jsonify(inventory)
+    return jsonify(inventory_list)
 
 @app.route('/inventory/<id>', methods=['PUT'])
 def update_inventory(id):
     session = Session(engine)
-    
-    # get request data
-    new_quantity = request.json['quantity']
-    
-    # get inventory item by id
+
     inventory_item = session.query(Inventory).filter_by(id=id).first()
-    
-    # update inventory item properties
-    inventory_item.quantity = new_quantity
-    
-    # commit changes and close session
+
+    updates = {
+        'name': request.json.get('name'),
+        'price': request.json.get('price'),
+        'size': request.json.get('size'),
+        'quantity': request.json.get('quantity'),
+        'image_url': request.json.get('image_url'),
+        'sku': request.json.get('sku')
+    }
+
+    report = []
+
+    for key, value in updates.items():
+        if value is not None and getattr(inventory_item, key) != value:
+            if key == "price":
+                report.append(f"{key.capitalize()} changed from ${getattr(inventory_item, key)} to ${value:.2f}")
+            else:
+                report.append(f"{key.capitalize()} changed from {getattr(inventory_item, key)} to {value}")
+            setattr(inventory_item, key, value)
+
+
     session.commit()
+
     session.close()
-    
-    return 'Inventory Updated'
+
+    return jsonify(report)
     
 
 if __name__ == "__main__":
