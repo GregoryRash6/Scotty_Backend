@@ -35,6 +35,7 @@
 			<th>Endpoint</th>
 			<th>Description</th>
 			<th>Requires API Key</th>
+			<th>Example Request</th>
 			<th>Example Response</th>
 		</tr>
 	</thead>
@@ -45,12 +46,14 @@
 			<td>Returns the homepage.</td>
 			<td>No</td>
 			<td>N/A</td>
+			<td>N/A</td>
 		</tr>
 		<tr>
 			<td>GET</td>
 			<td>/inventory</td>
 			<td>Returns a JSON object containing all products available for purchase.</td>
 			<td>No</td>
+			<td>N/A</td>
 			<td>
 			<pre>
 [
@@ -90,6 +93,19 @@
     "price": 10.0,
     "quantity": 1,
     "size": "N/A",
+    "sku": "21"
+}
+		</pre>
+			</td>
+			<td>
+				<pre>
+{
+    "id": 20,
+    "image_url": null,
+    "name": "Scotty Cameron Pin",
+    "price": 10.0,
+    "quantity": 1,
+    "size": "N/A",
     "sku": "20"
 }
 		</pre>
@@ -100,6 +116,13 @@
 			<td>/update_inventory/&lt;id&gt;</td>
 			<td>Updates the product with the specified ID.</td>
 			<td>Yes</td>
+			<td>
+			<pre>
+{
+    "image_url": ""
+}
+		</pre>
+		</td>
 			<td>
 			<pre>
 {
@@ -122,6 +145,7 @@
 			<td>/delete_inventory/&lt;id&gt;</td>
 			<td>Deletes the product with the specified ID.</td>
 			<td>Yes</td>
+			<td>N/A</td>
 			<td>
 				<pre>
 {
