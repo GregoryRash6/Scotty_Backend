@@ -69,6 +69,28 @@ def inventory():
     return jsonify(inventory_list)
 
 
+@app.route('/inventory/<id>', methods=['GET'])
+def get_inventory_item(id):
+    with Session(engine) as session:
+        inventory_item = session.query(Inventory).filter_by(id=id).first()
+
+        if inventory_item:
+            item_info = {
+                'id': inventory_item.id,
+                'name': inventory_item.name,
+                'price': float(inventory_item.price),
+                'size': inventory_item.size,
+                'quantity': inventory_item.quantity,
+                'image_url': inventory_item.image_url,
+                'sku': inventory_item.sku
+            }
+
+            return jsonify(item_info)
+
+        else:
+            return jsonify({'error': 'Item not found'}), 404
+
+
 @app.route('/update_inventory/<id>', methods=['PATCH'])
 def update_inventory(id):
     with Session(engine) as session:
