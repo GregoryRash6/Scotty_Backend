@@ -31,6 +31,12 @@ def require_api_key():
             abort(401, 'Unauthorized')
 
 
+@app.after_request
+def add_header(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
 @app.route("/")
 def index():
     """Returns Homepage"""
