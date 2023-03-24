@@ -9,13 +9,14 @@ app = Flask(__name__)
 
 load_dotenv()
 
+db_username = os.getenv("db_username")
 password = os.getenv("password")
 url = os.getenv("url")
 port = os.getenv("port")
 database = os.getenv("database")
 api_key = os.getenv("api_key")
 
-connection_string = f"postgres:{password}@{url}:{port}/{database}"
+connection_string = f"{db_username}:{password}@{url}:{port}/{database}"
 engine = create_engine(f'postgresql://{connection_string}')
 
 Base = automap_base()
