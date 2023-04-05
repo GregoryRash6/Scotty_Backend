@@ -55,7 +55,8 @@ def inventory():
             Inventory.quantity,
             Inventory.image_url,
             Inventory.sku,
-            Inventory.id
+            Inventory.id,
+            Inventory.description
         ]
 
         result = session.query(*sel).distinct().all()
@@ -69,6 +70,7 @@ def inventory():
                 "image_url": row[4],
                 "sku": row[5],
                 "id": row[6],
+                "description": row[7],
             }
             for row in result
         ]
@@ -89,7 +91,8 @@ def get_inventory_item(id):
                 'size': inventory_item.size,
                 'quantity': inventory_item.quantity,
                 'image_url': inventory_item.image_url,
-                'sku': inventory_item.sku
+                'sku': inventory_item.sku,
+                'description': inventory_item.description
             }
 
             return jsonify(item_info)
@@ -109,7 +112,8 @@ def update_inventory(id):
             'size': request.json.get('size'),
             'quantity': request.json.get('quantity'),
             'image_url': request.json.get('image_url'),
-            'sku': request.json.get('sku')
+            'sku': request.json.get('sku'),
+            'description': request.json.get('description')
         }
 
         report = {}
@@ -131,7 +135,8 @@ def update_inventory(id):
             'size': inventory_item.size,
             'quantity': inventory_item.quantity,
             'image_url': inventory_item.image_url,
-            'sku': inventory_item.sku
+            'sku': inventory_item.sku,
+            'description': inventory_item.description
         }
         updated_item.update(report)
 
@@ -147,7 +152,8 @@ def add_inventory():
             size=request.json['size'],
             quantity=request.json['quantity'],
             image_url=request.json['image_url'],
-            sku=request.json['sku']
+            sku=request.json['sku'],
+            description=request.json['description']
         )
         session.add(new_item)
         session.commit()
@@ -159,7 +165,8 @@ def add_inventory():
             'size': new_item.size,
             'quantity': new_item.quantity,
             'image_url': new_item.image_url,
-            'sku': new_item.sku
+            'sku': new_item.sku,
+            'description': new_item.description
         }
 
     return jsonify(added_item)
@@ -180,7 +187,8 @@ def delete_inventory(id):
             'size': inventory_item.size,
             'quantity': inventory_item.quantity,
             'image_url': inventory_item.image_url,
-            'sku': inventory_item.sku
+            'sku': inventory_item.sku,
+            'description': inventory_item.description
         }
 
         session.delete(inventory_item)
