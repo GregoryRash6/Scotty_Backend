@@ -6,6 +6,7 @@ CREATE TABLE inventory (
     quantity INTEGER,
     image_url TEXT,
     sku TEXT,
+    description TEXT
 );
 
 CREATE TABLE orders (
